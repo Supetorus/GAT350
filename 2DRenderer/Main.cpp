@@ -1,33 +1,30 @@
+#include "Renderer.h"
+
 #include <iostream>
 #include <SDL.h>
 
 int main(int, char**)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
+	const int WIDTH = 800;
+	const int HEIGHT = 600;
+
+	std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>();
+	renderer->Initialize(WIDTH, HEIGHT);
+
+	bool quit = false;
+	SDL_Event event;
+	while (!quit)
 	{
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		return 1;
+		SDL_PollEvent(&event);
+		switch (event.type)
+		{
+		case SDL_QUIT:
+			quit = true;
+			break;
+		}
+
+		renderer->Present();
 	}
-
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
-	{
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		return 1;
-	}
-
-	SDL_Window* window = SDL_CreateWindow("GAT350", 100, 100, 800, 600, SDL_WINDOW_SHOWN);
-	if (window == nullptr)
-	{
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		return 1;
-	}
-
-	// wait for keyboard enter to exit
-	std::getchar();
-
-	SDL_Quit();
-
 
 	SDL_Quit();
 
