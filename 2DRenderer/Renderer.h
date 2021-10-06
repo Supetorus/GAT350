@@ -10,7 +10,7 @@ public:
 	~Renderer();
 
 	bool Initialize(int width, int height, bool fullscreen = false);
-
+	void CopyBuffer(class Framebuffer* buffer);
     void Present();
 
 public:
