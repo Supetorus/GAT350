@@ -5,7 +5,7 @@ Framebuffer::Framebuffer(Renderer* renderer, int width, int height)
     this->width = width;
     this->height = height;
 
-    texture = SDL_CreateTexture(renderer->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TextureAccess::SDL_TEXTUREACCESS_STREAMING, width, height);
+    texture = SDL_CreateTexture(renderer->renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TextureAccess::SDL_TEXTUREACCESS_STREAMING, width, height);
 
     pitch = width * sizeof(color_t);
     buffer = new uint8_t[pitch * height];
@@ -26,20 +26,20 @@ void Framebuffer::Clear(const color_t& color)
 {
     for (int i = 0; i < width * height; i++)
     {
-        buffer[i * sizeof(color_t)] = color.r;
-        buffer[i * sizeof(color_t) + 1] = color.g;
-        buffer[i * sizeof(color_t) + 2] = color.b;
-        buffer[i * sizeof(color_t) + 3] = color.a;
+        ((color_t*)(buffer))[i] = color;
     }
 }
 
 void Framebuffer::DrawPoint(int x, int y, const color_t& color)
 {
-    int index = x * sizeof(color_t) + y * pitch;
-    buffer[index] = color.r;
-    buffer[index + 1] = color.g;
-    buffer[index + 2] = color.b;
-    buffer[index + 3] = color.a;
+    if (x < 0 || x >= width || y < 0 || y >= height) return;
+
+    ((color_t*)(buffer))[x + y * width] = color;
+
+    //buffer[index] = color.r;
+    //buffer[index + 1] = color.g;
+    //buffer[index + 2] = color.b;
+    //buffer[index + 3] = color.a;
 }
 
 void Framebuffer::DrawRect(int x, int y, int rect_width, int rect_height, const color_t& color)
@@ -57,7 +57,40 @@ void Framebuffer::DrawRect(int x, int y, int rect_width, int rect_height, const 
 
 void Framebuffer::DrawLine(int x1, int y1, int x2, int y2, const color_t& color)
 {
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    if (dx == 0)
+    {
+        if (y1 > y2) std::swap(y1, y2);
+        for (int y = y1; y <= y2; y++)
+        {
+            DrawPoint(x1, y, color);
+        }
+    }
+    else
+    {
+        float m = dy / (float)dx;
+        float b = y1 - (m * x1);
 
+        if (std::abs(dx) > std::abs(dy))
+        {
+            if (x1 > x2) std::swap(x1, x2);
+            for (int x = x1; x <= x2; x++)
+            {
+                int y = (int)round((m * x) + b);
+                DrawPoint(x, y, color);
+            }
+        }
+        else
+        {
+            if (y1 > y2) std::swap(y1, y2);
+            for (int y = y1; y <= y2; y++)
+            {
+                int x = (int)round((y - b) / m); // y=mx+b == (y-b)/m = x
+                DrawPoint(x, y, color);
+            }
+        }
+    }
 }
 
 void Framebuffer::DrawCircle(int x, int y, int radius, const color_t& color)
