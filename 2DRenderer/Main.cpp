@@ -34,28 +34,32 @@ int main(int, char**)
 		//}
 
 		//color_t color = { rand() % 255, rand() % 255, rand() % 255, 255 };
-		////color_t color = { 0, 0, 255, 255 };
-		//frameBuffer->DrawRect(20, 20, 20, 60, color);
-		//frameBuffer->DrawRect(60, 60, 20, 20, color);
-		//frameBuffer->DrawRect(100, 20, 20, 60, color);
-		//frameBuffer->DrawRect(20, 80, 100, 20, color);
-
-		//frameBuffer->DrawRect(140, 20, 20, 20, color);
-		//frameBuffer->DrawRect(140, 60, 20, 40, color);
-
-		//frameBuffer->DrawRect(180, 20, 20, 80, color);
-
-		//frameBuffer->DrawRect(220, 20, 20, 80, color);
+		color_t color = { 255, 255, 255, 255 };
+		frameBuffer->DrawRect(20, 20, 20, 60, color);
+		frameBuffer->DrawRect(60, 60, 20, 20, color);
+		frameBuffer->DrawRect(100, 20, 20, 60, color);
+		frameBuffer->DrawRect(20, 80, 100, 20, color);
+		
+		frameBuffer->DrawRect(140, 20, 20, 20, color);
+		frameBuffer->DrawRect(140, 60, 20, 40, color);
+		
+		frameBuffer->DrawRect(180, 20, 20, 80, color);
+		
+		frameBuffer->DrawRect(220, 20, 20, 80, color);
 
 		//for (int i = 0; i < 20; i++)
 		//{
 		//	frameBuffer->DrawLine(frameBuffer->width >> 1, frameBuffer->height >> 1, rand() % frameBuffer->width, rand() % frameBuffer->height, { 255, 255, 0, 0 });
 		//}
 
-		//frameBuffer->DrawTriangle(100, 100, 200, 250, 300, 400, color);
+		frameBuffer->DrawTriangle(100, 100, 180, 180, 100, 200, color);
 
-		//frameBuffer->DrawSimpleCurve(200, 200, 300, 100, 3, { 255, 255, 255, 255 });
-		frameBuffer->DrawQuadraticCurve(200, 200, 300, 100, 400, 200, 10, { 255, 255, 255, 255 });
+		frameBuffer->DrawSimpleCurve(200, 150, 300, 100, 3, color);
+		frameBuffer->DrawQuadraticCurve(200, 200, 300, 100, 400, 200, 10, color);
+		
+		frameBuffer->DrawCubicCurve(200, 400, 200, 300, 400, 300, 300, 400, 10, color);
+
+		frameBuffer->DrawCircle(500, 200, 80, color);
 
 		frameBuffer->Update();
 
