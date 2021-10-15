@@ -1,4 +1,5 @@
 #pragma once
+#include "ColorBuffer.h"
 #include <string>
 
 class Image
@@ -12,7 +13,8 @@ public:
 	friend class Framebuffer;
 
 private:
-	uint8_t* buffer{ nullptr };
-	int width;
-	int height;
+	ColorBuffer colorBuffer;
+	//uint8_t* buffer{ nullptr };
+	//int width;
+	//int height;
 };

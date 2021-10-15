@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "Framebuffer.h"
 #include "Image.h"
+#include "PostProcess.h"
 #include <iostream>
 #include <SDL.h>
 
@@ -15,7 +16,7 @@ int main(int, char**)
 	std::unique_ptr<Framebuffer> frameBuffer = std::make_unique<Framebuffer>(renderer.get(), renderer->width, renderer->height);
 
 	std::unique_ptr<Image> image = std::make_unique<Image>();
-	image->Load("../resources/sus.bmp");
+	image->Load("../resources/cat.bmp");
 	image->Flip();
 
 	bool quit = false;
@@ -35,6 +36,13 @@ int main(int, char**)
 		frameBuffer->DrawImage(30, 30, image.get());
 
 		frameBuffer->DrawCircle(300, 400, 100, { 255, 255, 255,255 });
+
+		//PostProcess::Invert(frameBuffer->colorBuffer);
+		//PostProcess::Monochrome(frameBuffer->colorBuffer);
+		//PostProcess::Noise(frameBuffer->colorBuffer, 100);
+		//PostProcess::Brightness(frameBuffer->colorBuffer, -100);
+		//PostProcess::ColorBalance(frameBuffer->colorBuffer, 0, 0, 100);
+		//PostProcess::Threshold(frameBuffer->colorBuffer, 200);
 
 		frameBuffer->Update();
 

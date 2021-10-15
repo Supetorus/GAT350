@@ -5,7 +5,7 @@
 
 Image::~Image()
 {
-    delete[] buffer;
+    //delete[] colorBuffer.data;
 }
 
 bool Image::Load(const std::string& filename, uint8_t alpha)
@@ -31,14 +31,14 @@ bool Image::Load(const std::string& filename, uint8_t alpha)
     }
 
     // Get width and height
-    width = *((int*)(&header[18]));
-    height = *((int*)(&header[22]));
+    colorBuffer.width = *((int*)(&header[18]));
+    colorBuffer.height = *((int*)(&header[22]));
 
     // Set the pitch (the number of bytes per horizontal line)
-    int pitch = width * sizeof(color_t);
+    colorBuffer.pitch = colorBuffer.width * sizeof(color_t);
 
     // Create the image buffer, this will hold the image data to display
-    buffer = new uint8_t[width * pitch];
+    colorBuffer.data = new uint8_t[colorBuffer.width * colorBuffer.pitch];
 
     // Get the number of bits per pixel of the .bmp
     uint16_t bitsPerPixel = *((uint16_t*)(&header[28]));
@@ -47,7 +47,7 @@ bool Image::Load(const std::string& filename, uint8_t alpha)
     uint16_t bytesPerPixel = bitsPerPixel / 8;
 
     // Calculate the size (in bytes) of the .bmp image data to read
-    size_t size = width * height * bytesPerPixel;
+    size_t size = colorBuffer.width * colorBuffer.height * bytesPerPixel;
 
     // Create a data buffer to read the .bmp image data into
     uint8_t* data = new uint8_t[size];
@@ -56,7 +56,7 @@ bool Image::Load(const std::string& filename, uint8_t alpha)
     stream.read((char*)data, size);
 
     // Set the .bmp image data into the Image class buffer
-    for (int i = 0; i < width * height; i++)
+    for (int i = 0; i < colorBuffer.width * colorBuffer.height; i++)
     {
         color_t color;
 
@@ -67,7 +67,7 @@ bool Image::Load(const std::string& filename, uint8_t alpha)
         color.r = data[index + 2];
         color.a = alpha;
 
-        ((color_t*)(buffer))[i] = color;
+        ((color_t*)(colorBuffer.data))[i] = color;
     }
 
     // Release the data buffer that was used to read the .bmp image data into
@@ -80,15 +80,15 @@ bool Image::Load(const std::string& filename, uint8_t alpha)
 void Image::Flip()
 {
     // set the pitch (width * number of bytes per pixel)
-    int pitch = width * sizeof(color_t);
+    int pitch = colorBuffer.width * sizeof(color_t);
 
     // create temporary line to store data
     uint8_t* temp = new uint8_t[pitch];
 
-    for (int i = 0; i < height / 2; i++)
+    for (int i = 0; i < colorBuffer.height / 2; i++)
     {
-        uint8_t* line1 = &((buffer)[i * pitch]);
-        uint8_t* line2 = &((buffer)[((height - 1) - i) * pitch]);
+        uint8_t* line1 = &((colorBuffer.data)[i * pitch]);
+        uint8_t* line2 = &((colorBuffer.data)[((colorBuffer.height - 1) - i) * pitch]);
         memcpy(temp, line1, pitch);
         memcpy(line1, line2, pitch);
         memcpy(line2, temp, pitch);

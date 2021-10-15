@@ -8,44 +8,44 @@
 
 Framebuffer::Framebuffer(Renderer* renderer, int width, int height)
 {
-    this->width = width;
-    this->height = height;
+    this->colorBuffer.width = width;
+    this->colorBuffer.height = height;
 
     texture = SDL_CreateTexture(renderer->renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TextureAccess::SDL_TEXTUREACCESS_STREAMING, width, height);
 
-    pitch = width * sizeof(color_t);
-    buffer = new uint8_t[pitch * height];
+    colorBuffer.pitch = width * sizeof(color_t);
+    colorBuffer.data = new uint8_t[colorBuffer.pitch * height];
 }
 
 Framebuffer::~Framebuffer()
 {
     SDL_DestroyTexture(texture);
-    delete[] buffer;
+    //delete[] colorBuffer.data;
 }
 
 void Framebuffer::Update()
 {
-    SDL_UpdateTexture(texture, nullptr, buffer, pitch);
+    SDL_UpdateTexture(texture, nullptr, colorBuffer.data, colorBuffer.pitch);
 }
 
 void Framebuffer::Clear(const color_t& color)
 {
-    for (int i = 0; i < width * height; i++)
+    for (int i = 0; i < colorBuffer.width * colorBuffer.height; i++)
     {
-        ((color_t*)(buffer))[i] = color;
+        ((color_t*)(colorBuffer.data))[i] = color;
     }
 }
 
 void Framebuffer::DrawPoint(int x, int y, const color_t& color)
 {
-    if (x < 0 || x >= width || y < 0 || y >= height) return;
+    if (x < 0 || x >= colorBuffer.width || y < 0 || y >= colorBuffer.height) return;
 
-    ((color_t*)(buffer))[x + y * width] = color;
+    ((color_t*)(colorBuffer.data))[x + y * colorBuffer.width] = color;
 }
 
 void Framebuffer::DrawRect(int x, int y, int rect_width, int rect_height, const color_t& color)
 {
-    if (x < 0 || x >= width || y < 0 || y >= height) return;
+    if (x < 0 || x >= colorBuffer.width || y < 0 || y >= colorBuffer.height) return;
 
     for (int sy = y; sy < y + rect_height; sy++)
     {
@@ -171,14 +171,19 @@ void Framebuffer::DrawCircle(int cx, int cy, int radius, const color_t& color)
 
 void Framebuffer::DrawCircleOctants(int cx, int cy, int x, int y, const color_t& color)
 {
-    DrawPoint(cx + x, cy + y, color);
-    DrawPoint(cx + x, cy - y, color);
-    DrawPoint(cx - x, cy + y, color);
-    DrawPoint(cx - x, cy - y, color);
+    DrawLine(cx - x, cy - y, cx + x, cy - y, color); // top top
+    DrawLine(cx + y, cy - x, cx - y, cy - x, color); // lower top
+    DrawLine(cx - x, cy + y, cx + x, cy + y, color); // bottom bottom
+    DrawLine(cx + y, cy + x, cx - y, cy + x, color); // upper bottom
 
-    DrawPoint(cx + y, cy + x, color);
+    //DrawPoint(cx + x, cy + y, color);
+    //DrawPoint(cx + x, cy - y, color);
+    //DrawPoint(cx - x, cy + y, color);
+    //DrawPoint(cx - x, cy - y, color);
+
+    //DrawPoint(cx + y, cy + x, color);
     DrawPoint(cx + y, cy - x, color);
-    DrawPoint(cx - y, cy + x, color);
+    //DrawPoint(cx - y, cy + x, color);
     DrawPoint(cx - y, cy - x, color);
 }
 
@@ -261,20 +266,18 @@ void Framebuffer::DrawCubicCurve(int x1, int y1, int x2, int y2, int x3, int y3,
 
 void Framebuffer::DrawImage(int x1, int y1, class Image* image)
 {
-    for (int y = 0; y < image->height; y++)
+    for (int y = 0; y < image->colorBuffer.height; y++)
     {
         int sy = y1 + y;
-        for (int x = 0; x < image->width; x++)
+        for (int x = 0; x < image->colorBuffer.width; x++)
         {
             int sx = x1 + x;
-            if (sx > width || sy > height) continue;
+            if (sx > colorBuffer.width || sy > colorBuffer.height) continue;
 
-            ((color_t*)buffer)[sx + (sy * width)] = ((color_t*)image->buffer)[x + (y * image->width)];
+            ((color_t*)colorBuffer.data)[sx + (sy * colorBuffer.width)] = ((color_t*)image->colorBuffer.data)[x + (y * image->colorBuffer.width)];
         }
     }
 }
-
-
 
 int Framebuffer::Lerp(int a, int b, float t)
 {
