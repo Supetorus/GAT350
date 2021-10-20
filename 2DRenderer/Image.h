@@ -12,8 +12,10 @@ public:
 
 	friend class Framebuffer;
 
-private:
+public:
 	ColorBuffer colorBuffer;
+
+private:
 	//uint8_t* buffer{ nullptr };
 	//int width;
 	//int height;

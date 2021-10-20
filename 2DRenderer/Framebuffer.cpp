@@ -39,8 +39,18 @@ void Framebuffer::Clear(const color_t& color)
 void Framebuffer::DrawPoint(int x, int y, const color_t& color)
 {
     if (x < 0 || x >= colorBuffer.width || y < 0 || y >= colorBuffer.height) return;
+    //((color_t*)(colorBuffer.data))[x + y * colorBuffer.width] = color;
 
-    ((color_t*)(colorBuffer.data))[x + y * colorBuffer.width] = color;
+    // Alpha Blending
+    uint8_t alpha = color.a;
+    uint8_t invAlpha = 255 - alpha;
+
+    color_t& destColor = ((color_t*)(colorBuffer.data))[x + y * colorBuffer.width];
+
+    destColor.r = ((color.r * alpha) + (destColor.r * invAlpha)) >> 8;
+    destColor.g = ((color.g * alpha) + (destColor.g * invAlpha)) >> 8;
+    destColor.b = ((color.b * alpha) + (destColor.b * invAlpha)) >> 8;
+
 }
 
 void Framebuffer::DrawRect(int x, int y, int rect_width, int rect_height, const color_t& color)
@@ -182,9 +192,9 @@ void Framebuffer::DrawCircleOctants(int cx, int cy, int x, int y, const color_t&
     //DrawPoint(cx - x, cy - y, color);
 
     //DrawPoint(cx + y, cy + x, color);
-    DrawPoint(cx + y, cy - x, color);
+    //DrawPoint(cx + y, cy - x, color);
     //DrawPoint(cx - y, cy + x, color);
-    DrawPoint(cx - y, cy - x, color);
+    //DrawPoint(cx - y, cy - x, color);
 }
 
 void Framebuffer::DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, const color_t& color)
@@ -274,7 +284,9 @@ void Framebuffer::DrawImage(int x1, int y1, class Image* image)
             int sx = x1 + x;
             if (sx > colorBuffer.width || sy > colorBuffer.height) continue;
 
-            ((color_t*)colorBuffer.data)[sx + (sy * colorBuffer.width)] = ((color_t*)image->colorBuffer.data)[x + (y * image->colorBuffer.width)];
+            //((color_t*)colorBuffer.data)[sx + (sy * colorBuffer.width)] = ((color_t*)image->colorBuffer.data)[x + (y * image->colorBuffer.width)];
+            color_t color = ((color_t*)image->colorBuffer.data)[x + (y * image->colorBuffer.width)];
+            DrawPoint(sx, sy, color);
         }
     }
 }
