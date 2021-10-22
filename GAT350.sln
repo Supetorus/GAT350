@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2DRenderer", "2DRenderer\2DRenderer.vcxproj", "{8EF5CC60-51B4-4982-B5D8-8F228BB22F72}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RayTracer", "RayTracer\RayTracer.vcxproj", "{431A1682-89B1-44A7-A932-D150BCF5AE6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{8EF5CC60-51B4-4982-B5D8-8F228BB22F72}.Release|x64.Build.0 = Release|x64
 		{8EF5CC60-51B4-4982-B5D8-8F228BB22F72}.Release|x86.ActiveCfg = Release|Win32
 		{8EF5CC60-51B4-4982-B5D8-8F228BB22F72}.Release|x86.Build.0 = Release|Win32
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Debug|x64.ActiveCfg = Debug|x64
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Debug|x64.Build.0 = Debug|x64
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Debug|x86.ActiveCfg = Debug|Win32
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Debug|x86.Build.0 = Debug|Win32
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Release|x64.ActiveCfg = Release|x64
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Release|x64.Build.0 = Release|x64
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Release|x86.ActiveCfg = Release|Win32
+		{431A1682-89B1-44A7-A932-D150BCF5AE6C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
