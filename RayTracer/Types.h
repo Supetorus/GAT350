@@ -23,3 +23,13 @@ inline color_t Vec3ToColor(const glm::vec3& vec3)
 
     return color;
 }
+
+inline float dot(const glm::vec3& v1, const glm::vec3& v2)
+{
+    return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
+}
+
+inline float angle(const glm::vec3& v1, const glm::vec3& v2)
+{
+    return glm::acos(dot(v1, v2));
+}
