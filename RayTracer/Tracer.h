@@ -8,4 +8,7 @@ class Tracer
 {
 public:
 	void Trace(const ColorBuffer& colorbuffer, Scene* scene);
+
+public:
+	int samples = 10;
 };

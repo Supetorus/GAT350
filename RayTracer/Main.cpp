@@ -28,6 +28,10 @@ int main(int, char**)
 	scene->Add(std::move(sphere));
 	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -5, 0 }, glm::vec3{ 0, 1, 0 })));
 
+		frameBuffer->Clear({ 0, 0, 0, 0 });
+		tracer->Trace(frameBuffer->colorBuffer, scene.get());
+		frameBuffer->Update();
+
 	bool quit = false;
 	SDL_Event event;
 	while (!quit)
@@ -40,11 +44,6 @@ int main(int, char**)
 			break;
 		}
 
-		frameBuffer->Clear({ 0, 0, 0, 0 });
-
-		tracer->Trace(frameBuffer->colorBuffer, scene.get());
-
-		frameBuffer->Update();
 
 		renderer->CopyBuffer(frameBuffer.get());
 
