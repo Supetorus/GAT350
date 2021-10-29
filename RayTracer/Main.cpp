@@ -5,6 +5,7 @@
 #include "Tracer.h"
 #include "Scene.h"
 #include "Plane.h"
+#include "Camera.h"
 
 #include <iostream>
 #include <SDL.h>
@@ -17,7 +18,7 @@ int main(int, char**)
 	std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>();
 	renderer->Initialize(WIDTH, HEIGHT);
 
-	std::unique_ptr<Framebuffer> frameBuffer = std::make_unique<Framebuffer>(renderer.get(), renderer->width, renderer->height);
+	std::unique_ptr<Framebuffer> framebuffer = std::make_unique<Framebuffer>(renderer.get(), renderer->width, renderer->height);
 
 	// ray tracer
 	std::unique_ptr<Tracer> tracer = std::make_unique<Tracer>();
@@ -27,13 +28,23 @@ int main(int, char**)
 	//std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f);
 	//scene->Add(std::move(sphere));
 	//scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -5, 0 }, glm::vec3{ 0, 1, 0 })));
-	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f, std::make_shared<Lambertian>(glm::vec3{ 1, 0, 0 }))));
-	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 3, 3, -8 }, 1.0f, std::make_shared<Metal>(glm::vec3{ 0, 1, 0 }, 0.0f))));
-	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -3, 0 }, glm::vec3{ 0, 1, 0 }, std::make_shared<Lambertian>(glm::vec3{ 0.5f, 0.5f, 0.5f }))));
-
-	frameBuffer->Clear({ 0, 0, 0, 0 });
-	tracer->Trace(frameBuffer->colorBuffer, scene.get());
-	frameBuffer->Update();
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f,
+		std::make_shared<Lambertian>(glm::vec3{ 1, 0.2f, 0.6f }))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 3, 3, -8 }, 1.0f,
+		std::make_shared<Metal>(glm::vec3{ 0.4f, 1, 0 }, 0.0f))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 7, 1, 0 }, 1.7f,
+		std::make_shared<Metal>(glm::vec3{ 0, 1, 1 }, 0.0f))));
+	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -3, 0 }, glm::vec3{ 0, 1, 0 },
+		std::make_shared<Lambertian>(glm::vec3{ 0.5f, 0.5f, 0.5f }))));
+	
+	float focalLength = glm::length(glm::vec3{ 5, 5, 5 } - glm::vec3{ 0, 0, -10 });
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3{ 5, 5, 5 }, glm::vec3{ 0, 0, -10 },
+		glm::vec3{ 0, 1, 0 }, 90.0f, glm::ivec2{ framebuffer->colorBuffer.width,
+		framebuffer->colorBuffer.height }, 1.0f, focalLength);
+	
+	framebuffer->Clear({ 0, 0, 0, 0 });
+	tracer->Trace(framebuffer->colorBuffer, scene.get(), camera.get());
+	framebuffer->Update();
 
 	bool quit = false;
 	SDL_Event event;
@@ -48,7 +59,7 @@ int main(int, char**)
 		}
 
 
-		renderer->CopyBuffer(frameBuffer.get());
+		renderer->CopyBuffer(framebuffer.get());
 
 		renderer->Present();
 	}
