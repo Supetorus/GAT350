@@ -24,13 +24,16 @@ int main(int, char**)
 
 	// scene
 	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
-	std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f);
-	scene->Add(std::move(sphere));
-	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -5, 0 }, glm::vec3{ 0, 1, 0 })));
+	//std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f);
+	//scene->Add(std::move(sphere));
+	//scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -5, 0 }, glm::vec3{ 0, 1, 0 })));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f, std::make_shared<Lambertian>(glm::vec3{ 1, 0, 0 }))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 3, 3, -8 }, 1.0f, std::make_shared<Metal>(glm::vec3{ 0, 1, 0 }, 0.0f))));
+	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -3, 0 }, glm::vec3{ 0, 1, 0 }, std::make_shared<Lambertian>(glm::vec3{ 0.5f, 0.5f, 0.5f }))));
 
-		frameBuffer->Clear({ 0, 0, 0, 0 });
-		tracer->Trace(frameBuffer->colorBuffer, scene.get());
-		frameBuffer->Update();
+	frameBuffer->Clear({ 0, 0, 0, 0 });
+	tracer->Trace(frameBuffer->colorBuffer, scene.get());
+	frameBuffer->Update();
 
 	bool quit = false;
 	SDL_Event event;
