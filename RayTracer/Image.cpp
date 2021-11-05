@@ -8,6 +8,11 @@ Image::~Image()
     //delete[] colorBuffer.data;
 }
 
+Image::Image(const std::string& filename, uint8_t alpha)
+{
+    Load(filename, alpha);
+}
+
 bool Image::Load(const std::string& filename, uint8_t alpha)
 {
     // Open bmp file and set it to read in the file as binary data (not text)

@@ -1,7 +1,9 @@
 #include "Scene.h"
 
-glm::vec3 Scene::Trace(const ray_t& ray, float tMin, float tMax, raycastHit_t& hit)
+glm::vec3 Scene::Trace(const ray_t& ray, float tMin, float tMax, raycastHit_t& hit, int depth)
 {
+	if (depth <= 0) return glm::vec3{ 0, 0, 0 };
+
     float tClosest = tMax;
     bool rayHit = false;
     for (auto& object : objects)
@@ -20,17 +22,18 @@ glm::vec3 Scene::Trace(const ray_t& ray, float tMin, float tMax, raycastHit_t& h
 
 		if (hit.material->Scatter(ray, hit, attenuation, scattered))
 		{
-			return attenuation * Trace(scattered, tMin, tMax, hit);
+			return attenuation * Trace(scattered, tMin, tMax, hit, depth - 1);
 		}
 		else
 		{
 			return { 0, 0, 0 };
 		}
 	}
-
+	
+	// Sky
     glm::vec3 direction = glm::normalize(ray.direction);
     float t = (direction.y + 1) * 0.5f;
-    return glm::lerp(glm::vec3(0.5f, 0.7f, 1.0f), glm::vec3(1, 1, 1), t);
+    return glm::lerp(glm::vec3(1, 1, 1), glm::vec3(0.5f, 0.7f, 1), t);
 
     //return glm::vec3{ 1, 1, 1 }; //sky color
 }

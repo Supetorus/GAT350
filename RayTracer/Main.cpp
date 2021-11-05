@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <SDL.h>
+//#include <memory>
 
 int main(int, char**)
 {
@@ -20,10 +21,13 @@ int main(int, char**)
 
 	std::unique_ptr<Framebuffer> framebuffer = std::make_unique<Framebuffer>(renderer.get(), renderer->width, renderer->height);
 
-	// ray tracer
+	// Ray Tracer
 	std::unique_ptr<Tracer> tracer = std::make_unique<Tracer>();
 
-	// scene
+	// Samplers
+	std::shared_ptr<Image> image = std::make_shared<Image>("../resources/cat.bmp", 255);
+
+	// Scene
 	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
 	//std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f);
 	//scene->Add(std::move(sphere));
