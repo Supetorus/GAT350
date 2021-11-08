@@ -23,6 +23,7 @@ struct ray_t
 	ray_t(const glm::vec3& origin, const glm::vec3& direction) : origin{ origin }, direction{ direction } {}
 
 	glm::vec3 pointAt(float t) const { return origin + direction * t; }
+	static glm::vec2 GetUV(const glm::vec3& point);
 };
 
 inline glm::vec2 GetPlanarUV(const glm::vec3& point)
@@ -48,3 +49,17 @@ inline glm::vec2 GetSphericalUV(const glm::vec3& point)
 
 	return uv;
 }
+
+//inline glm::vec2 GetPlanarUV(const glm::vec3& point)
+//{
+//	glm::vec2 uv{ point.x, point.z };
+//
+//	float i;
+//	uv[0] = modf(uv[0], &i);
+//	uv[1] = modf(uv[1], &i);
+//
+//	uv[0] = (uv[0] < 0) ? 1 + uv[0] : uv[0];
+//	uv[1] = (uv[1] < 0) ? 1 + uv[1] : uv[1];
+//
+//	return uv;
+//}

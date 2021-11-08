@@ -6,6 +6,7 @@
 #include "Scene.h"
 #include "Plane.h"
 #include "Camera.h"
+#include "Sampler.h"
 
 #include <iostream>
 #include <SDL.h>
@@ -24,28 +25,29 @@ int main(int, char**)
 	// Ray Tracer
 	std::unique_ptr<Tracer> tracer = std::make_unique<Tracer>();
 
-	// Samplers
-	std::shared_ptr<Image> image = std::make_shared<Image>("../resources/cat.bmp", 255);
+	// samplers
+	std::shared_ptr<TextureSampler> texture1 = std::make_unique<TextureSampler>(std::make_unique<Image>("../resources/flower.bmp"));
+	std::shared_ptr<TextureSampler> texture2 = std::make_unique<TextureSampler>(std::make_unique<Image>("../resources/lava.bmp"));
 
-	// Scene
+	std::shared_ptr<CheckerSampler> black_checker = std::make_unique<CheckerSampler>(glm::vec3{ 0, 0, 0 }, glm::vec3{ 1, 1, 1 });
+	std::shared_ptr<CheckerSampler> red_checker = std::make_unique<CheckerSampler>(glm::vec3{ 0, 0, 0 }, glm::vec3{ 1, 0, 0 });
+
+	// scene
 	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
-	//std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f);
-	//scene->Add(std::move(sphere));
-	//scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -5, 0 }, glm::vec3{ 0, 1, 0 })));
-	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 0, -10 }, 3.0f,
-		std::make_shared<Lambertian>(glm::vec3{ 1, 0.2f, 0.6f }))));
-	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 3, 3, -8 }, 1.0f,
-		std::make_shared<Metal>(glm::vec3{ 0.4f, 1, 0 }, 0.0f))));
-	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 7, 1, 0 }, 1.7f,
-		std::make_shared<Metal>(glm::vec3{ 0, 1, 1 }, 0.0f))));
-	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -3, 0 }, glm::vec3{ 0, 1, 0 },
-		std::make_shared<Lambertian>(glm::vec3{ 0.5f, 0.5f, 0.5f }))));
-	
-	float focalLength = glm::length(glm::vec3{ 5, 5, 5 } - glm::vec3{ 0, 0, -10 });
-	std::unique_ptr<Camera> camera = std::make_unique<Camera>(glm::vec3{ 5, 5, 5 }, glm::vec3{ 0, 0, -10 },
-		glm::vec3{ 0, 1, 0 }, 90.0f, glm::ivec2{ framebuffer->colorBuffer.width,
-		framebuffer->colorBuffer.height }, 1.0f, focalLength);
-	
+
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 4, -10 }, 3.0f, std::make_shared<Lambertian>(texture1))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 5, 0, -8 }, 2.0f, std::make_shared<Lambertian>(glm::vec3{ 0, 0.52f, 0.97f }))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ -3, 4, -6 }, 1.5f, std::make_shared<Metal>(texture2, 0.05f))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 6.5f, -4 }, 1.5f, std::make_shared<Dielectric>(glm::vec3{ 1.0f, 0, 0 }, 2.42f))));
+	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -2, 0 }, glm::vec3{ 0, 1, 0 }, std::make_shared<Lambertian>(black_checker))));
+	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 10, 25, 20 }, 10.0f, std::make_shared<Emissive>(glm::vec3{ 10, 10, 10 }))));
+
+	// camera
+	glm::vec3 eye = glm::vec3{ 5, 6, 2 };
+	glm::vec3 lookAt = glm::vec3{ 0, 2, -10 };
+	float focalLength = glm::length(eye - lookAt);
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>(eye, lookAt, glm::vec3{ 0, 1, 0 }, 90.0f, glm::ivec2{ framebuffer->colorBuffer.width, framebuffer->colorBuffer.height }, 0.2f, focalLength);
+
 	framebuffer->Clear({ 0, 0, 0, 0 });
 	tracer->Trace(framebuffer->colorBuffer, scene.get(), camera.get());
 	framebuffer->Update();
@@ -61,7 +63,6 @@ int main(int, char**)
 			quit = true;
 			break;
 		}
-
 
 		renderer->CopyBuffer(framebuffer.get());
 
