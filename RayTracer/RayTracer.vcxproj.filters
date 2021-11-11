@@ -98,5 +98,8 @@
     <ClInclude Include="Sampler.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

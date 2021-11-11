@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.h"
 #include "ColorBuffer.h"
+#include "Buffer.h"
+#include <string>
 
 class Scene;
 class Camera;
@@ -8,9 +10,9 @@ class Camera;
 class Tracer
 {
 public:
-	void Trace(const ColorBuffer& colorBuffer, Scene* scene, Camera* camera);
+	void Trace(Buffer* buffer, Scene* scene, Camera* camera, const std::string& message);
 
 public:
-	int samples = 5;
-	int depth = 3;
+	int samples = 1;
+	int depth = 50;
 };

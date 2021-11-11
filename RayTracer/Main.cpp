@@ -1,29 +1,31 @@
 #include "Renderer.h"
 #include "Framebuffer.h"
-#include "Image.h"
 #include "PostProcess.h"
+#include "Image.h"
 #include "Tracer.h"
 #include "Scene.h"
-#include "Plane.h"
 #include "Camera.h"
-#include "Sampler.h"
+#include "Buffer.h"
 
 #include <iostream>
 #include <SDL.h>
-//#include <memory>
 
 int main(int, char**)
 {
 	srand((unsigned int)time(nullptr));
+
 	const int WIDTH = 800;
 	const int HEIGHT = 600;
+	int samples = 0;
 
 	std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>();
 	renderer->Initialize(WIDTH, HEIGHT);
 
 	std::unique_ptr<Framebuffer> framebuffer = std::make_unique<Framebuffer>(renderer.get(), renderer->width, renderer->height);
+	std::unique_ptr<Buffer> accumBuffer = std::make_unique<Buffer>(renderer->width, renderer->height);
+	std::unique_ptr<Buffer> buffer = std::make_unique<Buffer>(renderer->width, renderer->height);
 
-	// Ray Tracer
+	// ray tracer
 	std::unique_ptr<Tracer> tracer = std::make_unique<Tracer>();
 
 	// samplers
@@ -48,6 +50,7 @@ int main(int, char**)
 	// scene
 	std::unique_ptr<Scene> scene = std::make_unique<Scene>();
 
+	/*
 	for (int x = -10; x < 10; x++)
 	{
 		for (int z = -10; z < 10; z++)
@@ -75,10 +78,11 @@ int main(int, char**)
 			scene->Add(std::move(std::make_unique<Sphere>(position, radius, material)));
 		}
 	}
-
+	*/
 	scene->Add(std::move(std::make_unique<Plane>(glm::vec3{ 0, -0.01f, 0 }, glm::vec3{ 0, 1, 0 }, std::make_shared<Lambertian>(black_checker))));
 	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 1, 0 }, 1.0f, std::make_shared<Metal>(glm::vec3{ 0.8f, 0.8f, 0.8f }, 0.0f))));
 	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ -4, 1, 0 }, 1.0f, std::make_shared<Dielectric>(glm::vec3{ 1, 1, 1 }, 1.5f))));
+
 
 	scene->Add(std::move(std::make_unique<Sphere>(glm::vec3{ 0, 30, 0 }, 10.0f, std::make_shared<Emissive>(glm::vec3{ 10, 10, 10 }))));
 
@@ -86,11 +90,7 @@ int main(int, char**)
 	glm::vec3 eye{ 13, 2, 3 };
 	glm::vec3 lookAt{ 0, 0, 0 };
 	float focalLength = glm::length(eye - lookAt);
-	std::unique_ptr<Camera> camera = std::make_unique<Camera>(eye, lookAt, glm::vec3{ 0, 1, 0 }, 20.0f, glm::ivec2{ framebuffer->colorBuffer.width, framebuffer->colorBuffer.height }, 0.1f, focalLength);
-
-	framebuffer->Clear({ 0, 0, 0, 0 });
-	tracer->Trace(framebuffer->colorBuffer, scene.get(), camera.get());
-	framebuffer->Update();
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>(eye, lookAt, glm::vec3{ 0, 1, 0 }, 20.0f, glm::ivec2{ framebuffer->colorBuffer.width, framebuffer->colorBuffer.height }, 0.01f, focalLength);
 
 	bool quit = false;
 	SDL_Event event;
@@ -104,9 +104,24 @@ int main(int, char**)
 			break;
 		}
 
-		renderer->CopyBuffer(framebuffer.get());
+		// render to accumulation buffer
+		samples += tracer->samples;
+		std::string message = "Samples: " + std::to_string(samples);
+		tracer->Trace(accumBuffer.get(), scene.get(), camera.get(), message);
 
+		// copy accumulation buffer to buffer
+		*buffer.get() = *accumBuffer.get();
+		// process buffer values (average + sqrt)
+		buffer->Process(samples);
+
+		// copy buffer to frame buffer
+		buffer->Copy(framebuffer->colorBuffer);
+		framebuffer->Update();
+
+		// copy frame buffer to renderer
+		renderer->CopyBuffer(framebuffer.get());
 		renderer->Present();
+		std::cout << "Samples " << samples << std::endl;
 	}
 
 	SDL_Quit();
