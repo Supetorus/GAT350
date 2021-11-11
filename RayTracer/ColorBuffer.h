@@ -19,6 +19,7 @@ struct ColorBuffer
 	~ColorBuffer() { delete[] data; }
 
     inline void SetColor(int x, int y, const color_t& color) const;
+    inline color_t GetColor(int x, int y) const;
 
 	uint8_t* data{ nullptr };
 
@@ -32,4 +33,11 @@ inline void ColorBuffer::SetColor(int x, int y, const color_t& color) const
     if (x < 0 || x >= width || y < 0 || y >= height) return;
 
     ((color_t*)(data))[x + y * width] = color;
+}
+
+inline color_t ColorBuffer::GetColor(int x, int y) const
+{
+    if (x < 0 || x >= width || y < 0 || y >= height) return { 0, 0, 0 };
+
+    return ((color_t*)(data))[x + y * width];
 }

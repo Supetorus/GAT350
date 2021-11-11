@@ -11,7 +11,7 @@ public:
 
 	bool Load(const std::string& filename, uint8_t alpha = 255);
 	void Flip();
-
+	static void saveImage(const char* filename, const ColorBuffer& colorBuffer);
 	friend class Framebuffer;
 
 public:

@@ -39,12 +39,14 @@ void Tracer::Trace(Buffer* buffer, Scene* scene, Camera* camera, const std::stri
 			buffer->Add(x, y, color);
 		}
 
+		if (y % 100 == 0) std::cout << message << " Row #" << y << std::endl;
+
 		// calculate time
-		auto end = std::chrono::steady_clock::now();
-		auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		totalTime = totalTime + elapsedTime;
-		std::chrono::steady_clock::rep averageTime = totalTime / (y + 1);
-		std::chrono::steady_clock::rep estimatedTime = averageTime * buffer->height;
+		//auto end = std::chrono::steady_clock::now();
+		//auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		//totalTime = totalTime + elapsedTime;
+		//std::chrono::steady_clock::rep averageTime = totalTime / (y + 1);
+		//std::chrono::steady_clock::rep estimatedTime = averageTime * buffer->height;
 
 		// display time
 		//system("CLS");
